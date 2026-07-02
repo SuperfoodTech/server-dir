@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agency Weekly Laporan - File Explorer</title>
+  <!-- Google Fonts: Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons for folder & file details -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="glass-bg"></div>
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+
+  <div class="app-container">
+
+
+    <!-- Windows File Explorer Window -->
+    <div class="explorer-window">
+      <!-- Title Bar -->
+      <div class="explorer-title-bar">
+        <div class="window-title">
+          <i data-lucide="folder-open" class="window-title-icon"></i>
+          <span>File Explorer - Weekly Laporan</span>
+        </div>
+        <div class="window-controls">
+          <div class="control-btn minimize"></div>
+          <div class="control-btn maximize"></div>
+          <div class="control-btn close"></div>
+        </div>
+      </div>
+
+      <!-- Address & Search Bar -->
+      <div class="explorer-toolbar">
+        <div class="navigation-arrows">
+          <button class="nav-arrow-btn" id="btn-back" title="Back" disabled>
+            <i data-lucide="arrow-left"></i>
+          </button>
+          <button class="nav-arrow-btn" id="btn-forward" title="Forward" disabled>
+            <i data-lucide="arrow-right"></i>
+          </button>
+          <button class="nav-arrow-btn" id="btn-up" title="Up to Parent" disabled>
+            <i data-lucide="arrow-up"></i>
+          </button>
+          <button class="nav-arrow-btn" id="btn-refresh" title="Refresh">
+            <i data-lucide="rotate-cw"></i>
+          </button>
+        </div>
+
+        <!-- Address Bar -->
+        <div class="address-bar-wrapper">
+          <i data-lucide="monitor" class="address-monitor-icon"></i>
+          <div class="address-bar-path" id="address-path">
+            <span>This PC</span>
+            <i data-lucide="chevron-right" class="path-sep"></i>
+            <span>weekly</span>
+            <i data-lucide="chevron-right" class="path-sep"></i>
+            <span>agency</span>
+            <i data-lucide="chevron-right" class="path-sep"></i>
+            <span class="active-folder">laporan</span>
+          </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-box-wrapper">
+          <i data-lucide="search" class="search-box-icon"></i>
+          <input type="text" id="search-input" placeholder="Search laporan..." autocomplete="off">
+          <button id="clear-search" class="clear-search-btn" title="Clear Search">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+
+        <!-- Log Out Button -->
+        <button id="btn-logout" class="nav-arrow-btn" title="Log Out" style="margin-left: 0.25rem;">
+          <i data-lucide="log-out" style="color: #ff5f56;"></i>
+        </button>
+      </div>
+
+      <!-- Explorer Main View -->
+      <div class="explorer-main">
+
+
+        <!-- Files List Pane -->
+        <section class="explorer-files-pane">
+          <!-- Table/Grid View -->
+          <table class="files-table" id="files-table">
+            <thead>
+              <tr>
+                <th class="col-name" data-sort="name">Name</th>
+                <th class="col-date" data-sort="date">Date modified</th>
+                <th class="col-type" data-sort="type">Type</th>
+                <th class="col-size" data-sort="size">Size</th>
+                <th class="col-action">Action</th>
+              </tr>
+            </thead>
+            <tbody id="files-table-body">
+              <!-- Dynamically populated files and folders -->
+            </tbody>
+          </table>
+
+          <!-- Loading State -->
+          <div class="loading-state" id="loading-spinner">
+            <div class="spinner"></div>
+            <p>Reading index files...</p>
+          </div>
+
+          <!-- Empty State -->
+          <div class="empty-state hidden" id="empty-state">
+            <i data-lucide="folder-x" class="empty-icon"></i>
+            <h3>This folder is empty.</h3>
+            <p>No matching reports found in this directory.</p>
+          </div>
+        </section>
+      </div>
+
+      <!-- Status Bar -->
+      <footer class="explorer-status-bar">
+        <div class="status-left">
+          <span id="items-count">0 items</span>
+        </div>
+        <div class="status-right">
+          <span class="connection-status"><span class="status-dot"></span> Server Connected</span>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Custom Confirm Modal -->
+  <div id="confirm-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-icon">
+          <i data-lucide="log-out"></i>
+        </div>
+        <h3>Konfirmasi Keluar</h3>
+        <p>Apakah Anda yakin ingin keluar dari Laporan Viewer?</p>
+      </div>
+      <div class="modal-actions">
+        <button id="modal-cancel-btn" class="modal-btn btn-secondary">Batal</button>
+        <button id="modal-confirm-btn" class="modal-btn btn-danger">Keluar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

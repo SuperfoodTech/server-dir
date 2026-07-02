@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Laporan Viewer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .login-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      width: 100vw;
+      padding: 1.5rem;
+    }
+    .login-card {
+      width: 100%;
+      max-width: 400px;
+      background: var(--bg-window);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      padding: 2.5rem 2rem;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .login-header {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .login-logo {
+      width: 3.5rem;
+      height: 3.5rem;
+      background: linear-gradient(135deg, var(--excel-color), #22c55e);
+      border-radius: 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(16, 124, 65, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 0.5rem;
+    }
+    .login-logo i {
+      width: 1.75rem;
+      height: 1.75rem;
+      color: white;
+    }
+    .login-header h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+    .login-header p {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .form-group label {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .input-wrapper i {
+      position: absolute;
+      left: 0.75rem;
+      color: var(--text-muted);
+      width: 1rem;
+      height: 1rem;
+      pointer-events: none;
+    }
+    .input-wrapper input {
+      width: 100%;
+      height: 2.75rem;
+      background: rgba(8, 12, 20, 0.5);
+      border: 1px solid var(--border-color);
+      border-radius: 0.4rem;
+      padding: 0.35rem 1rem 0.35rem 2.2rem;
+      color: var(--text-primary);
+      font-family: var(--font-family);
+      font-size: 0.9rem;
+      transition: var(--transition-fast);
+    }
+    .input-wrapper input:focus {
+      outline: none;
+      border-color: var(--excel-color);
+      box-shadow: 0 0 8px rgba(16, 124, 65, 0.3);
+    }
+    .login-btn {
+      width: 100%;
+      height: 2.75rem;
+      background: linear-gradient(135deg, var(--excel-color), #22c55e);
+      border: none;
+      border-radius: 0.4rem;
+      color: white;
+      font-family: var(--font-family);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 15px rgba(16, 124, 65, 0.2);
+      transition: var(--transition-fast);
+      margin-top: 0.5rem;
+    }
+    .login-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(16, 124, 65, 0.3);
+    }
+    .login-btn:active {
+      transform: translateY(0);
+    }
+    .error-banner {
+      background: rgba(238, 77, 45, 0.1);
+      border: 1px solid rgba(238, 77, 45, 0.2);
+      border-radius: 0.4rem;
+      padding: 0.75rem 1rem;
+      color: #ff6b50;
+      font-size: 0.8rem;
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="glass-bg"></div>
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-logo">
+          <i data-lucide="shield-check"></i>
+        </div>
+        <h2>Laporan Viewer</h2>
+        <p>Masukkan password untuk mengakses file</p>
+      </div>
+
+      <div class="error-banner" id="error-banner">
+        <i data-lucide="alert-circle" style="width: 1.1rem; height: 1.1rem; flex-shrink:0;"></i>
+        <span id="error-text">Password salah</span>
+      </div>
+
+      <form id="login-form" style="display: flex; flex-direction: column; gap: 1.25rem;">
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-wrapper">
+            <i data-lucide="lock"></i>
+            <input type="password" id="password" autocomplete="current-password" placeholder="Masukkan password" required>
+          </div>
+        </div>
+
+        <button type="submit" class="login-btn" id="login-btn">
+          <span>Masuk</span>
+          <i data-lucide="arrow-right" style="width: 1.1rem; height: 1.1rem;"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Initialize icons
+    lucide.createIcons();
+
+    const form = document.getElementById('login-form');
+    const errorBanner = document.getElementById('error-banner');
+    const errorText = document.getElementById('error-text');
+    const loginBtn = document.getElementById('login-btn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const password = document.getElementById('password').value;
+      
+      errorBanner.style.display = 'none';
+      loginBtn.disabled = true;
+      loginBtn.innerHTML = '<span>Memverifikasi...</span>';
+
+      try {
+        const response = await fetch('api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          window.location.href = './';
+        } else {
+          showError(data.error || 'Password salah.');
+        }
+      } catch (err) {
+        showError('Gagal terhubung ke server.');
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = '<span>Masuk</span><i data-lucide="arrow-right" style="width: 1.1rem; height: 1.1rem;"></i>';
+        lucide.createIcons();
+      }
+    });
+
+    function showError(message) {
+      errorText.textContent = message;
+      errorBanner.style.display = 'flex';
+    }
+  </script>
+</body>
+</html>
