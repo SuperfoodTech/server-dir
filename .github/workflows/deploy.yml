@@ -3,7 +3,7 @@ name: Deploy Laporan Viewer
 on:
   push:
     branches:
-      - main
+      - feature/auto-deploy
 
 jobs:
   deploy:
@@ -26,14 +26,14 @@ jobs:
               echo "Initializing Git..."
               git init
               git remote add origin https://github.com/SuperfoodTech/server-dir.git
-              git branch -M main
+              git branch -M feature/auto-deploy
             fi
             
             echo "=== Pulling latest changes from GitHub ==="
             # Set trust for current directory to avoid git safe directory issues
             git config --global --add safe.directory /home/akbar/weekly/agency/laporan-viewer || true
-            git fetch origin main
-            git reset --hard origin/main
+            git fetch origin feature/auto-deploy
+            git reset --hard origin/feature/auto-deploy
             
             echo "=== Installing dependencies ==="
             npm install --omit=dev
