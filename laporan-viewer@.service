@@ -1,0 +1,15 @@
+[Unit]
+Description=Laporan Viewer - %I Service
+After=network.target
+
+[Service]
+Type=simple
+User=akbar
+WorkingDirectory=/home/akbar/weekly/agency/laporan-viewer
+ExecStart=/usr/bin/node server.js
+Restart=on-failure
+RestartSec=5
+EnvironmentFile=/etc/default/laporan-viewer-%i
+
+[Install]
+WantedBy=multi-user.target

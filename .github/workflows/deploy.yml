@@ -1,0 +1,51 @@
+name: Deploy Laporan Viewer
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          port: 22
+          script: |
+            echo "=== Navigating to Laporan Viewer directory ==="
+            cd /home/akbar/weekly/agency/laporan-viewer
+            
+            echo "=== Checking Git Repository ==="
+            if [ ! -d .git ]; then
+              echo "Initializing Git..."
+              git init
+              git remote add origin https://github.com/SuperfoodTech/server-dir.git
+              git branch -M main
+            fi
+            
+            echo "=== Pulling latest changes from GitHub ==="
+            # Set trust for current directory to avoid git safe directory issues
+            git config --global --add safe.directory /home/akbar/weekly/agency/laporan-viewer || true
+            git fetch origin main
+            git reset --hard origin/main
+            
+            echo "=== Installing dependencies ==="
+            npm install --omit=dev
+            
+            echo "=== Restarting Services ==="
+            # Restart systemd instances (if systemd is active)
+            echo "superF762!" | sudo -S systemctl restart laporan-viewer@weekly || true
+            echo "superF762!" | sudo -S systemctl restart laporan-viewer@baseline || true
+            echo "superF762!" | sudo -S systemctl restart laporan-viewer@vb || true
+            echo "superF762!" | sudo -S systemctl restart laporan-viewer@agency || true
+            
+            # Restart PM2 processes (if PM2 is active)
+            pm2 restart all || true
+            
+            echo "=== Deploy Finished ==="
