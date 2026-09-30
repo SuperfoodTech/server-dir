@@ -1,6 +1,7 @@
 // App State
 let reportData = null;
 let virtualTree = null; // Nested dynamic folder tree
+let rootFolderName = 'weekly'; // Name of the active base directory
 let currentPath = []; // Array of path segments, e.g. [], ['agency'], ['agency', 'laporan']
 let navigationHistory = [[]];
 let historyIndex = 0;
@@ -24,12 +25,13 @@ const btnBack = document.getElementById('btn-back');
 const btnForward = document.getElementById('btn-forward');
 const btnUp = document.getElementById('btn-up');
 const btnRefresh = document.getElementById('btn-refresh');
+const btnLogout = document.getElementById('btn-logout');
 
 const driveDetails = document.getElementById('drive-details');
 const driveProgress = document.getElementById('drive-progress');
 const statsGrabText = document.getElementById('stats-grab');
 const statsShopeeText = document.getElementById('stats-shopee');
-const sidebarFoldersList = document.getElementById('sidebar-folders-list');
+const sidebarDynamicRoot = document.getElementById('sidebar-dynamic-root');
 
 // Initialize Lucide Icons
 function initIcons() {
@@ -59,6 +61,7 @@ async function fetchReports() {
     const result = await response.json();
     if (result.success) {
       reportData = result;
+      rootFolderName = result.rootName || 'weekly';
       
       // Parse dynamic tree from files list
       virtualTree = buildTree(result.files);
@@ -180,10 +183,46 @@ function updateStoragePanel(stats) {
 
 // Build sidebar navigation dynamically
 function populateSidebar() {
-  sidebarFoldersList.innerHTML = '';
+  if (!sidebarDynamicRoot) return;
+  sidebarDynamicRoot.innerHTML = '';
   if (!virtualTree || !virtualTree.children) return;
   
-  // Recursively render directory items
+  // 1. Create the root item node representing the active base directory (weekly or laporan)
+  const rootLi = document.createElement('li');
+  rootLi.className = 'tree-item expanded';
+  
+  const hasSubfolders = Object.keys(virtualTree.children).some(k => virtualTree.children[k].isFolder);
+  
+  rootLi.innerHTML = `
+    <div class="tree-row" id="tree-root-row">
+      <i data-lucide="chevron-down" class="tree-arrow" style="${hasSubfolders ? '' : 'opacity:0;pointer-events:none;'}"></i>
+      <i data-lucide="folder-open" class="tree-icon"></i>
+      <strong>${rootFolderName}</strong>
+    </div>
+    <ul class="tree-children"></ul>
+  `;
+  
+  const rootRow = rootLi.querySelector('#tree-root-row');
+  const rootArrow = rootLi.querySelector('.tree-arrow');
+  const rootChildrenUl = rootLi.querySelector('.tree-children');
+  
+  rootRow.addEventListener('click', (e) => {
+    if (hasSubfolders) {
+      const isExpanded = rootLi.classList.toggle('expanded');
+      if (isExpanded) {
+        rootChildrenUl.classList.remove('hidden');
+        rootRow.querySelector('.tree-icon').setAttribute('data-lucide', 'folder-open');
+      } else {
+        rootChildrenUl.classList.add('hidden');
+        rootRow.querySelector('.tree-icon').setAttribute('data-lucide', 'folder');
+      }
+      initIcons();
+    }
+    navigateTo([]);
+    e.stopPropagation();
+  });
+  
+  // 2. Recursively render directory items
   function renderTreeNodes(node, parentPath, containerElement) {
     const keys = Object.keys(node.children).filter(k => node.children[k].isFolder).sort();
     
@@ -208,27 +247,30 @@ function populateSidebar() {
       const childrenUl = li.querySelector('.tree-children');
       
       // Check if this child itself has subfolders
-      const hasSubfolders = Object.keys(child.children).some(k => child.children[k].isFolder);
-      if (!hasSubfolders) {
+      const childHasSubfolders = Object.keys(child.children).some(k => child.children[k].isFolder);
+      if (!childHasSubfolders) {
         arrow.style.opacity = '0';
         arrow.style.pointerEvents = 'none';
       }
       
       row.addEventListener('click', (e) => {
-        if (hasSubfolders) {
+        if (childHasSubfolders) {
           const isExpanded = li.classList.toggle('expanded');
           if (isExpanded) {
             childrenUl.classList.remove('hidden');
+            row.querySelector('.tree-icon').setAttribute('data-lucide', 'folder-open');
           } else {
             childrenUl.classList.add('hidden');
+            row.querySelector('.tree-icon').setAttribute('data-lucide', 'folder');
           }
+          initIcons();
         }
         navigateTo(currentFullPath);
         e.stopPropagation();
       });
       
       // Recurse
-      if (hasSubfolders) {
+      if (childHasSubfolders) {
         renderTreeNodes(child, currentFullPath, childrenUl);
       }
       
@@ -236,7 +278,8 @@ function populateSidebar() {
     });
   }
   
-  renderTreeNodes(virtualTree, [], sidebarFoldersList);
+  renderTreeNodes(virtualTree, [], rootChildrenUl);
+  sidebarDynamicRoot.appendChild(rootLi);
   initIcons();
 }
 
@@ -270,7 +313,7 @@ function updateAddressBar() {
   let html = `
     <span onclick="navigateTo([])">This PC</span>
     <i data-lucide="chevron-right" class="path-sep"></i>
-    <span onclick="navigateTo([])" class="${currentPath.length === 0 ? 'active-folder' : ''}">weekly</span>
+    <span onclick="navigateTo([])" class="${currentPath.length === 0 ? 'active-folder' : ''}">${rootFolderName}</span>
   `;
   
   let tempPath = [];
@@ -292,6 +335,7 @@ function updateAddressBar() {
 }
 
 function highlightActiveSidebar() {
+  if (!sidebarDynamicRoot) return;
   document.querySelectorAll('.explorer-sidebar .tree-item').forEach(el => {
     el.classList.remove('active-tree-item');
   });
@@ -441,34 +485,54 @@ function renderExplorerContents() {
     const displayNameHTML = searchQuery ? highlightText(nameToDisplay, searchQuery) : nameToDisplay;
     
     const actionHTML = item.isFolder 
-      ? '' 
-      : `<button class="table-download-btn" onclick="downloadFile('${item.relativePath}')" title="Download Excel">
+      ? `<i data-lucide="chevron-right" class="mobile-folder-arrow"></i>` 
+      : `<button class="table-download-btn" onclick="event.stopPropagation(); downloadFile('${item.relativePath}')" title="Download Excel" aria-label="Download Excel">
           <i data-lucide="download"></i>
          </button>`;
          
+    tr.className = item.isFolder ? 'folder-row' : 'file-row';
+    if (selectedRowIndex === index) {
+      tr.classList.add('selected-row');
+    }
+
+    const subMeta = item.isFolder 
+      ? `Folder${dateStr !== '—' ? ' • ' + dateStr : ''}` 
+      : `${item.size}${dateStr !== '—' ? ' • ' + dateStr : ''}`;
+
     tr.innerHTML = `
-      <td>
+      <td class="col-name">
         <div class="cell-name-container">
           ${iconHTML}
-          <span class="item-name-text" title="${nameToDisplay}">${displayNameHTML}</span>
+          <div class="name-meta-wrap">
+            <span class="item-name-text" title="${nameToDisplay}">${displayNameHTML}</span>
+            <span class="mobile-sub-meta">${subMeta}</span>
+          </div>
         </div>
       </td>
-      <td>${dateStr}</td>
-      <td>${item.type}</td>
-      <td>${item.isFolder ? '—' : item.size}</td>
-      <td>${actionHTML}</td>
+      <td class="col-date">${dateStr}</td>
+      <td class="col-type">${item.type}</td>
+      <td class="col-size">${item.isFolder ? '—' : item.size}</td>
+      <td class="col-action">${actionHTML}</td>
     `;
     
     tr.addEventListener('click', (e) => {
+      if (e.target.closest('.table-download-btn')) {
+        return;
+      }
+
       document.querySelectorAll('.files-table tbody tr').forEach(row => {
         row.classList.remove('selected-row');
       });
       tr.classList.add('selected-row');
       selectedRowIndex = index;
-      e.stopPropagation();
+
+      if (window.innerWidth <= 768 && item.isFolder) {
+        navigateTo(item.path);
+      }
     });
     
-    tr.addEventListener('dblclick', () => {
+    tr.addEventListener('dblclick', (e) => {
+      if (e.target.closest('.table-download-btn')) return;
       if (item.isFolder) {
         navigateTo(item.path);
       } else {
@@ -539,14 +603,6 @@ btnRefresh.addEventListener('click', () => {
   fetchReports();
 });
 
-// Sidebar root trigger
-document.getElementById('tree-root-row').addEventListener('click', () => {
-  navigateTo([]);
-});
-document.getElementById('tree-laporan-trigger').addEventListener('click', (e) => {
-  navigateTo([]);
-  e.stopPropagation();
-});
 
 // Header column sorting click listeners
 document.querySelectorAll('.files-table th').forEach(th => {
@@ -570,6 +626,43 @@ document.addEventListener('click', () => {
   });
   selectedRowIndex = -1;
 });
+
+// Logout custom modal handling
+const confirmModal = document.getElementById('confirm-modal');
+const modalCancelBtn = document.getElementById('modal-cancel-btn');
+const modalConfirmBtn = document.getElementById('modal-confirm-btn');
+
+if (btnLogout && confirmModal && modalCancelBtn && modalConfirmBtn) {
+  btnLogout.addEventListener('click', () => {
+    confirmModal.classList.remove('hidden');
+  });
+
+  modalCancelBtn.addEventListener('click', () => {
+    confirmModal.classList.add('hidden');
+  });
+
+  // Close modal when clicking outside the card
+  confirmModal.addEventListener('click', (e) => {
+    if (e.target === confirmModal) {
+      confirmModal.classList.add('hidden');
+    }
+  });
+
+  modalConfirmBtn.addEventListener('click', async () => {
+    try {
+      const response = await fetch('api/logout', { method: 'POST' });
+      if (response.ok) {
+        window.location.href = 'login.html';
+      } else {
+        alert('Gagal logout.');
+      }
+    } catch (err) {
+      alert('Terjadi kesalahan jaringan.');
+    } finally {
+      confirmModal.classList.add('hidden');
+    }
+  });
+}
 
 // Initial load
 document.addEventListener('DOMContentLoaded', () => {

@@ -279,13 +279,22 @@ body {
   padding: 0.6rem 1rem;
   display: flex;
   align-items: center;
-  gap: 0.85rem;
+  gap: 0.75rem;
   border-bottom: 1px solid var(--border-color);
+}
+
+.toolbar-nav-row {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 0.75rem;
+  min-width: 0;
 }
 
 .navigation-arrows {
   display: flex;
   gap: 0.25rem;
+  flex-shrink: 0;
 }
 
 .nav-arrow-btn {
@@ -300,6 +309,7 @@ body {
   justify-content: center;
   cursor: pointer;
   transition: var(--transition-fast);
+  flex-shrink: 0;
 }
 
 .nav-arrow-btn:hover:not(:disabled) {
@@ -318,9 +328,19 @@ body {
   height: 1.1rem;
 }
 
+.btn-logout {
+  color: #ff5f56;
+}
+
+.btn-logout:hover:not(:disabled) {
+  background: rgba(255, 95, 86, 0.15) !important;
+  border-color: rgba(255, 95, 86, 0.3) !important;
+}
+
 /* Address Bar styling */
 .address-bar-wrapper {
   flex: 1;
+  min-width: 0;
   background: rgba(8, 12, 20, 0.5);
   border: 1px solid var(--border-color);
   border-radius: 0.4rem;
@@ -347,6 +367,7 @@ body {
   white-space: nowrap;
   overflow-x: auto;
   scrollbar-width: none;
+  min-width: 0;
 }
 
 .address-bar-path::-webkit-scrollbar {
@@ -358,6 +379,7 @@ body {
   padding: 0.1rem 0.3rem;
   border-radius: 0.25rem;
   transition: var(--transition-fast);
+  flex-shrink: 0;
 }
 
 .address-bar-path span:hover {
@@ -383,6 +405,7 @@ body {
   position: relative;
   width: 260px;
   height: 2rem;
+  flex-shrink: 0;
 }
 
 .search-box-icon {
@@ -568,18 +591,34 @@ body {
   background-color: var(--bg-row-active) !important;
 }
 
-/* Columns widths */
-.col-name { width: 50%; }
-.col-date { width: 20%; }
+/* Columns widths (Desktop) */
+.col-name { width: 44%; }
+.col-date { width: 22%; }
 .col-type { width: 18%; }
-.col-size { width: 12%; }
+.col-size { width: 10%; }
+.col-action { width: 6%; text-align: center; }
 
 /* File / Folder cell designs */
 .cell-name-container {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.65rem;
   max-width: 480px;
+}
+
+.name-meta-wrap {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.mobile-sub-meta {
+  display: none;
+}
+
+.mobile-folder-arrow {
+  display: none;
 }
 
 .item-icon {
@@ -733,26 +772,226 @@ body {
   display: none !important;
 }
 
+/* ===================================================
+   Mobile Adaptive Styles (< 768px)
+   =================================================== */
 @media (max-width: 768px) {
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .app-container {
+    padding: 0.35rem 0.35rem calc(0.35rem + env(safe-area-inset-bottom, 0px)) 0.35rem;
+    height: 100dvh;
+    max-height: 100dvh;
+  }
+
+  .explorer-window {
+    border-radius: 0.75rem;
+    height: 100%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+
+  .explorer-title-bar {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .window-title {
+    font-size: 0.82rem;
+  }
+
+  /* Responsive Toolbar */
+  .explorer-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    padding: 0.5rem 0.65rem;
+  }
+
+  .toolbar-nav-row {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .navigation-arrows {
+    gap: 0.15rem;
+  }
+
+  .nav-arrow-btn {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .nav-arrow-btn i {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .address-bar-wrapper {
+    flex: 1;
+    min-width: 0;
+    height: 2rem;
+    padding: 0.2rem 0.5rem;
+    gap: 0.35rem;
+  }
+
+  .address-bar-path {
+    font-size: 0.78rem;
+  }
+
+  .search-box-wrapper {
+    width: 100%;
+    height: 2.2rem;
+  }
+
+  #search-input {
+    font-size: 16px; /* Prevents auto-zoom in iOS Safari */
+    padding: 0.35rem 2rem 0.35rem 2rem;
+    border-radius: 0.5rem;
+  }
+
+  .search-box-icon {
+    left: 0.65rem;
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+
+  /* Main Panes */
   .explorer-sidebar {
     display: none;
   }
-  .col-type, .col-date {
-    display: none;
+
+  .explorer-files-pane {
+    padding: 0.4rem;
+    -webkit-overflow-scrolling: touch;
   }
-  .col-name {
-    width: 75%;
+
+  /* Mobile Card-style Table Layout */
+  .files-table thead {
+    display: none; /* Hide table headers completely on mobile */
   }
-  .col-size {
-    width: 25%;
-  }
-  .main-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-  .drive-stats-wrapper {
+
+  .files-table, 
+  .files-table tbody {
+    display: block;
     width: 100%;
+  }
+
+  .files-table tbody tr {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.65rem 0.75rem;
+    margin-bottom: 0.35rem;
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 0.65rem;
+    min-height: 3.6rem;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .files-table tbody tr:active {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+
+  .files-table tbody tr.selected-row {
+    background-color: rgba(16, 124, 65, 0.15) !important;
+    border-color: rgba(16, 124, 65, 0.35) !important;
+  }
+
+  .col-date, 
+  .col-type, 
+  .col-size {
+    display: none !important;
+  }
+
+  .col-name {
+    width: auto !important;
+    flex: 1;
+    min-width: 0;
+    padding: 0 !important;
+    border: none !important;
+  }
+
+  .cell-name-container {
+    max-width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .item-icon {
+    width: 1.75rem;
+    height: 1.75rem;
+    flex-shrink: 0;
+  }
+
+  .item-name-text {
+    font-size: 0.92rem;
+    font-weight: 500;
+    line-height: 1.25;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mobile-sub-meta {
+    display: block;
+    font-size: 0.73rem;
+    color: var(--text-secondary);
+    margin-top: 0.2rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .col-action {
+    width: auto !important;
+    flex-shrink: 0;
+    padding: 0 0 0 0.5rem !important;
+    border: none !important;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .table-download-btn {
+    width: 2.35rem;
+    height: 2.35rem;
+    opacity: 1;
+    background: rgba(16, 124, 65, 0.25);
+    border: 1px solid rgba(16, 124, 65, 0.45);
+    color: #4ade80;
+    border-radius: 0.5rem;
+  }
+
+  .table-download-btn:active {
+    background: var(--excel-color);
+    color: #ffffff;
+    transform: scale(0.95);
+  }
+
+  .table-download-btn i {
+    width: 1.05rem;
+    height: 1.05rem;
+  }
+
+  .mobile-folder-arrow {
+    display: block;
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--text-muted);
+  }
+
+  .explorer-status-bar {
+    padding: 0.35rem 0.75rem calc(0.35rem + env(safe-area-inset-bottom, 0px)) 0.75rem;
+    font-size: 0.7rem;
   }
 }
 

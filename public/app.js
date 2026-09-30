@@ -485,34 +485,54 @@ function renderExplorerContents() {
     const displayNameHTML = searchQuery ? highlightText(nameToDisplay, searchQuery) : nameToDisplay;
     
     const actionHTML = item.isFolder 
-      ? '' 
-      : `<button class="table-download-btn" onclick="downloadFile('${item.relativePath}')" title="Download Excel">
+      ? `<i data-lucide="chevron-right" class="mobile-folder-arrow"></i>` 
+      : `<button class="table-download-btn" onclick="event.stopPropagation(); downloadFile('${item.relativePath}')" title="Download Excel" aria-label="Download Excel">
           <i data-lucide="download"></i>
          </button>`;
          
+    tr.className = item.isFolder ? 'folder-row' : 'file-row';
+    if (selectedRowIndex === index) {
+      tr.classList.add('selected-row');
+    }
+
+    const subMeta = item.isFolder 
+      ? `Folder${dateStr !== '—' ? ' • ' + dateStr : ''}` 
+      : `${item.size}${dateStr !== '—' ? ' • ' + dateStr : ''}`;
+
     tr.innerHTML = `
-      <td>
+      <td class="col-name">
         <div class="cell-name-container">
           ${iconHTML}
-          <span class="item-name-text" title="${nameToDisplay}">${displayNameHTML}</span>
+          <div class="name-meta-wrap">
+            <span class="item-name-text" title="${nameToDisplay}">${displayNameHTML}</span>
+            <span class="mobile-sub-meta">${subMeta}</span>
+          </div>
         </div>
       </td>
-      <td>${dateStr}</td>
-      <td>${item.type}</td>
-      <td>${item.isFolder ? '—' : item.size}</td>
-      <td>${actionHTML}</td>
+      <td class="col-date">${dateStr}</td>
+      <td class="col-type">${item.type}</td>
+      <td class="col-size">${item.isFolder ? '—' : item.size}</td>
+      <td class="col-action">${actionHTML}</td>
     `;
     
     tr.addEventListener('click', (e) => {
+      if (e.target.closest('.table-download-btn')) {
+        return;
+      }
+
       document.querySelectorAll('.files-table tbody tr').forEach(row => {
         row.classList.remove('selected-row');
       });
       tr.classList.add('selected-row');
       selectedRowIndex = index;
-      e.stopPropagation();
+
+      if (window.innerWidth <= 768 && item.isFolder) {
+        navigateTo(item.path);
+      }
     });
     
-    tr.addEventListener('dblclick', () => {
+    tr.addEventListener('dblclick', (e) => {
+      if (e.target.closest('.table-download-btn')) return;
       if (item.isFolder) {
         navigateTo(item.path);
       } else {

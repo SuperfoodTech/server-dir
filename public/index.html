@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Agency Weekly Laporan - File Explorer</title>
   <!-- Google Fonts: Outfit -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,7 +18,6 @@
   <div class="glow-orb orb-2"></div>
 
   <div class="app-container">
-
 
     <!-- Windows File Explorer Window -->
     <div class="explorer-window">
@@ -37,33 +36,40 @@
 
       <!-- Address & Search Bar -->
       <div class="explorer-toolbar">
-        <div class="navigation-arrows">
-          <button class="nav-arrow-btn" id="btn-back" title="Back" disabled>
-            <i data-lucide="arrow-left"></i>
-          </button>
-          <button class="nav-arrow-btn" id="btn-forward" title="Forward" disabled>
-            <i data-lucide="arrow-right"></i>
-          </button>
-          <button class="nav-arrow-btn" id="btn-up" title="Up to Parent" disabled>
-            <i data-lucide="arrow-up"></i>
-          </button>
-          <button class="nav-arrow-btn" id="btn-refresh" title="Refresh">
-            <i data-lucide="rotate-cw"></i>
-          </button>
-        </div>
-
-        <!-- Address Bar -->
-        <div class="address-bar-wrapper">
-          <i data-lucide="monitor" class="address-monitor-icon"></i>
-          <div class="address-bar-path" id="address-path">
-            <span>This PC</span>
-            <i data-lucide="chevron-right" class="path-sep"></i>
-            <span>weekly</span>
-            <i data-lucide="chevron-right" class="path-sep"></i>
-            <span>agency</span>
-            <i data-lucide="chevron-right" class="path-sep"></i>
-            <span class="active-folder">laporan</span>
+        <div class="toolbar-nav-row">
+          <div class="navigation-arrows">
+            <button class="nav-arrow-btn" id="btn-back" title="Back" disabled aria-label="Go Back">
+              <i data-lucide="arrow-left"></i>
+            </button>
+            <button class="nav-arrow-btn" id="btn-forward" title="Forward" disabled aria-label="Go Forward">
+              <i data-lucide="arrow-right"></i>
+            </button>
+            <button class="nav-arrow-btn" id="btn-up" title="Up to Parent" disabled aria-label="Up to Parent">
+              <i data-lucide="arrow-up"></i>
+            </button>
+            <button class="nav-arrow-btn" id="btn-refresh" title="Refresh" aria-label="Refresh">
+              <i data-lucide="rotate-cw"></i>
+            </button>
           </div>
+
+          <!-- Address Bar -->
+          <div class="address-bar-wrapper">
+            <i data-lucide="monitor" class="address-monitor-icon"></i>
+            <div class="address-bar-path" id="address-path">
+              <span>This PC</span>
+              <i data-lucide="chevron-right" class="path-sep"></i>
+              <span>weekly</span>
+              <i data-lucide="chevron-right" class="path-sep"></i>
+              <span>agency</span>
+              <i data-lucide="chevron-right" class="path-sep"></i>
+              <span class="active-folder">laporan</span>
+            </div>
+          </div>
+
+          <!-- Log Out Button -->
+          <button id="btn-logout" class="nav-arrow-btn btn-logout" title="Log Out" aria-label="Log Out">
+            <i data-lucide="log-out"></i>
+          </button>
         </div>
 
         <!-- Search Bar -->
@@ -74,11 +80,6 @@
             <i data-lucide="x"></i>
           </button>
         </div>
-
-        <!-- Log Out Button -->
-        <button id="btn-logout" class="nav-arrow-btn" title="Log Out" style="margin-left: 0.25rem;">
-          <i data-lucide="log-out" style="color: #ff5f56;"></i>
-        </button>
       </div>
 
       <!-- Explorer Main View -->
